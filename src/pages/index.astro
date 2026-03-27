@@ -15,8 +15,7 @@ import Footer from "@/components/Footer.astro";
 </Layout>
 
 <script>
-// Séquence : { type: "prompt"|"command"|"output"|"empty" }
-const sequence = [
+const lines: Array<{type: string, text?: string, final?: boolean, nav?: boolean}> = [
   { type: "prompt" },
   { type: "command", text: "cat whoami.txt" },
   { type: "empty" },
@@ -34,7 +33,7 @@ const sequence = [
   { type: "prompt" },
   { type: "command", text: "ls interests/" },
   { type: "empty" },
-  { type: "output", text: "  /Cybersecurity  /OSINT  /History  /Travel  /Martial_Arts  /Nature  /Scuba_Diving" },
+  { type: "output", text: "  /Cybersecurity  /OSINT  /History  /Martial_Arts  /Nature  /Scuba_Diving" },
   { type: "empty" },
   { type: "prompt" },
   { type: "command", text: "ls navigation/" },
@@ -46,19 +45,19 @@ const sequence = [
 ];
 
 const PROMPT = "rHACKham@leRouge:~$ ";
-const consoleEl = document.getElementById("console");
+const consoleEl = document.getElementById("console") as HTMLDivElement;
 let step = 0;
 
-function addLine(html) {
+function addLine(html: string): HTMLDivElement {
   const div = document.createElement("div");
   div.innerHTML = html;
   consoleEl.appendChild(div);
   return div;
 }
 
-function runStep() {
-  if (step >= sequence.length) return;
-  const s = sequence[step];
+function runStep(): void {
+  if (step >= lines.length) return;
+  const s = lines[step];
 
   if (s.type === "empty") {
     addLine("&nbsp;");
@@ -66,19 +65,18 @@ function runStep() {
     setTimeout(runStep, 40);
 
   } else if (s.type === "prompt") {
-    // Prompt apparaît instantanément
     addLine(`<span class="prompt-text">${PROMPT}</span>`);
     step++;
     setTimeout(runStep, 0);
 
   } else if (s.type === "command") {
-    // La commande s'écrit caractère par caractère sur la même ligne que le prompt précédent
-    const lastDiv = consoleEl.lastElementChild;
+    const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
     let i = 0;
+    const text = s.text ?? "";
     const interval = setInterval(() => {
-      i = Math.min(i + 1, s.text.length);
-      lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${s.text.substring(0, i)}`;
-      if (i >= s.text.length) {
+      i = Math.min(i + 1, text.length);
+      lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${text.substring(0, i)}`;
+      if (i >= text.length) {
         clearInterval(interval);
         step++;
         setTimeout(runStep, 150);
@@ -86,13 +84,13 @@ function runStep() {
     }, 40);
 
   } else if (s.type === "output") {
-    // Output apparaît caractère par caractère
     const div = addLine("");
     let i = 0;
+    const text = s.text ?? "";
     const interval = setInterval(() => {
-      i = Math.min(i + 2, s.text.length);
-      div.textContent = s.text.substring(0, i);
-      if (i >= s.text.length) {
+      i = Math.min(i + 2, text.length);
+      div.textContent = text.substring(0, i);
+      if (i >= text.length) {
         clearInterval(interval);
         step++;
         setTimeout(runStep, 30);
@@ -100,7 +98,6 @@ function runStep() {
     }, 18);
 
   } else if (s.type === "nav") {
-    // Output nav apparaît d'un coup
     const div = document.createElement("div");
     div.innerHTML = `&nbsp;&nbsp;<a href="/posts">/posts</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/tags">/tags</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/about">/about</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
     consoleEl.appendChild(div);
@@ -108,8 +105,7 @@ function runStep() {
     setTimeout(runStep, 80);
 
   } else if (s.type === "cursor") {
-    // Curseur clignotant sur la dernière ligne de prompt
-    const lastDiv = consoleEl.lastElementChild;
+    const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
     const cursor = document.createElement("span");
     cursor.className = "cursor";
     cursor.textContent = "█";
