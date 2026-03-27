@@ -1,111 +1,206 @@
 ---
-import { getCollection } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Socials from "@/components/Socials.astro";
-import LinkButton from "@/components/LinkButton.astro";
-import Card from "@/components/Card.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
-import IconRss from "@/assets/icons/IconRss.svg";
-import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
-import { SITE } from "@/config";
-import { SOCIALS } from "@/constants";
-
-const posts = await getCollection("blog");
-
-const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 ---
 
-<Layout>
+<Layout title="rHACKham-le-Rouge">
   <Header />
-  <main id="main-content" data-layout="index" class="app-layout">
-    <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        rHACKham-le-Rouge
-      </h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="inline-block"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <IconRss
-          width={20}
-          height={20}
-          class="scale-125 stroke-accent stroke-3 rtl:-rotate-90"
-        />
-        <span class="sr-only">RSS Feed</span>
-      </a>
-
-      <p>
-        Cybersecurity, CTF, bug bounty and personal projects.
-        I break things (legally) and write about what I learn.
-      </p>
-
-      {
-        // only display if at least one social link is enabled
-        SOCIALS.length > 0 && (
-          <div class="mt-4 flex max-sm:flex-col sm:items-center">
-            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">Social Links:</div>
-            <Socials />
-          </div>
-        )
-      }
+  <main id="main-content" class="app-layout">
+    <section id="hero">
+      <div id="console"></div>
     </section>
-
-    {
-      featuredPosts.length > 0 && (
-        <section
-          id="featured"
-          class:list={[
-            "pt-12 pb-6",
-            { "border-b border-border": recentPosts.length > 0 },
-          ]}
-        >
-          <h2 class="text-2xl font-semibold tracking-wide">Featured</h2>
-          <ul>
-            {featuredPosts.map(data => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">Recent Posts</h2>
-          <ul>
-            {recentPosts.map(
-              (data, index) =>
-                index < SITE.postPerIndex && <Card variant="h3" {...data} />
-            )}
-          </ul>
-        </section>
-      )
-    }
-
-    <div class="my-8 text-center">
-      <LinkButton href="/posts/">
-        All Posts
-        <IconArrowRight class="inline-block rtl:-rotate-180" />
-      </LinkButton>
-    </div>
   </main>
   <Footer />
 </Layout>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
-    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
-      ?.dataset?.layout;
-    if (indexLayout) {
-      sessionStorage.setItem("backUrl", "/");
-    }
-  });
+// Séquence : { type: "prompt"|"command"|"output"|"empty" }
+const sequence = [
+  { type: "prompt" },
+  { type: "command", text: "cat whoami.txt" },
+  { type: "empty" },
+  { type: "output", text: "They call me rHACKham-le-Rouge." },
+  { type: "output", text: "Aspiring cybersecurity professional focused on offensive security," },
+  { type: "output", text: "currently preparing to join an engineering program in cyber defense at ESNA." },
+  { type: "empty" },
+  { type: "output", text: "I train daily through CTFs, Hack The Box, and TryHackMe," },
+  { type: "output", text: "working on pentesting, networking, and vulnerability reporting." },
+  { type: "empty" },
+  { type: "output", text: "This blog documents my learning journey as I grow into" },
+  { type: "output", text: "a future cyber defense engineer." },
+  { type: "output", text: "S2RxcWxlZG8gRWR1ZmQ6ICJMIHpsb28gaWxxZyBkIHpkYiBydSBmdWhkd2ggcnFoIg==" },
+  { type: "empty" },
+  { type: "prompt" },
+  { type: "command", text: "ls interests/" },
+  { type: "empty" },
+  { type: "output", text: "  /Cybersecurity  /OSINT  /History  /Travel  /Martial_Arts  /Nature  /Scuba_Diving" },
+  { type: "empty" },
+  { type: "prompt" },
+  { type: "command", text: "ls navigation/" },
+  { type: "empty" },
+  { type: "nav" },
+  { type: "empty" },
+  { type: "prompt" },
+  { type: "cursor" },
+];
+
+const PROMPT = "rHACKham@leRouge:~$ ";
+const consoleEl = document.getElementById("console");
+let step = 0;
+
+function addLine(html) {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  consoleEl.appendChild(div);
+  return div;
+}
+
+function runStep() {
+  if (step >= sequence.length) return;
+  const s = sequence[step];
+
+  if (s.type === "empty") {
+    addLine("&nbsp;");
+    step++;
+    setTimeout(runStep, 40);
+
+  } else if (s.type === "prompt") {
+    // Prompt apparaît instantanément
+    addLine(`<span class="prompt-text">${PROMPT}</span>`);
+    step++;
+    setTimeout(runStep, 0);
+
+  } else if (s.type === "command") {
+    // La commande s'écrit caractère par caractère sur la même ligne que le prompt précédent
+    const lastDiv = consoleEl.lastElementChild;
+    let i = 0;
+    const interval = setInterval(() => {
+      i = Math.min(i + 1, s.text.length);
+      lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${s.text.substring(0, i)}`;
+      if (i >= s.text.length) {
+        clearInterval(interval);
+        step++;
+        setTimeout(runStep, 150);
+      }
+    }, 40);
+
+  } else if (s.type === "output") {
+    // Output apparaît caractère par caractère
+    const div = addLine("");
+    let i = 0;
+    const interval = setInterval(() => {
+      i = Math.min(i + 2, s.text.length);
+      div.textContent = s.text.substring(0, i);
+      if (i >= s.text.length) {
+        clearInterval(interval);
+        step++;
+        setTimeout(runStep, 30);
+      }
+    }, 18);
+
+  } else if (s.type === "nav") {
+    // Output nav apparaît d'un coup
+    const div = document.createElement("div");
+    div.innerHTML = `&nbsp;&nbsp;<a href="/posts">/posts</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/tags">/tags</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/about">/about</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
+    consoleEl.appendChild(div);
+    step++;
+    setTimeout(runStep, 80);
+
+  } else if (s.type === "cursor") {
+    // Curseur clignotant sur la dernière ligne de prompt
+    const lastDiv = consoleEl.lastElementChild;
+    const cursor = document.createElement("span");
+    cursor.className = "cursor";
+    cursor.textContent = "█";
+    lastDiv.appendChild(cursor);
+  }
+}
+
+runStep();
 </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :global(body),
+  :global(html) {
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
+  }
+
+  /* Header - cible toutes les variantes possibles */
+  :global(header),
+  :global(header.app-layout),
+  :global([class*="header"]),
+  :global(#main-header) {
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) {
+    color: #00ff41 !important;
+  }
+
+  :global(header svg),
+  :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer),
+  :global(footer.app-layout) {
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  #hero {
+    min-height: calc(100vh - 120px);
+    padding: 3rem 2rem;
+  }
+
+  #console {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #00ff41;
+    max-width: 800px;
+  }
+
+  #console .prompt-text {
+    color: #00c832;
+  }
+
+  #console a {
+    color: #00ff41;
+    text-decoration: none;
+    border-bottom: 1px solid #004400;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  #console a:hover {
+    color: #fff;
+    border-bottom-color: #00ff41;
+  }
+
+:global(.cursor) {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+  :global(:root),
+  :global([data-theme]),
+  :global(html) {
+    --background: #0a0a0a !important;
+    --color-background: #0a0a0a !important;
+  }
+</style>
