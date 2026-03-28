@@ -15,7 +15,9 @@ import Footer from "@/components/Footer.astro";
 </Layout>
 
 <script>
-const lines: Array<{type: string, text?: string, final?: boolean, nav?: boolean}> = [
+const PROMPT = "rHACKham@leRouge:~$ ";
+
+const lines: Array<{type: string, text?: string}> = [
   { type: "prompt" },
   { type: "command", text: "cat whoami.txt" },
   { type: "empty" },
@@ -23,7 +25,7 @@ const lines: Array<{type: string, text?: string, final?: boolean, nav?: boolean}
   { type: "output", text: "Aspiring cybersecurity professional focused on offensive security," },
   { type: "output", text: "currently preparing to join an engineering program in cyber defense at ESNA." },
   { type: "empty" },
-  { type: "output", text: "I train daily through CTFs, Hack The Box, RootMe and TryHackMe," },
+  { type: "output", text: "I train daily through CTFs, Hack The Box, and TryHackMe," },
   { type: "output", text: "working on pentesting, networking, and vulnerability reporting." },
   { type: "empty" },
   { type: "output", text: "This blog documents my learning journey as I grow into" },
@@ -33,7 +35,7 @@ const lines: Array<{type: string, text?: string, final?: boolean, nav?: boolean}
   { type: "prompt" },
   { type: "command", text: "ls interests/" },
   { type: "empty" },
-  { type: "output", text: "  /Cybersecurity  /OSINT  /OPSEC  /History  /Martial_Arts  /Nature  /Scuba_Diving" },
+  { type: "output", text: "  /Cybersecurity  /OSINT  /History  /Martial_Arts  /Nature  /Scuba_Diving" },
   { type: "empty" },
   { type: "prompt" },
   { type: "command", text: "ls navigation/" },
@@ -44,76 +46,84 @@ const lines: Array<{type: string, text?: string, final?: boolean, nav?: boolean}
   { type: "cursor" },
 ];
 
-const PROMPT = "rHACKham@leRouge:~$ ";
-const consoleEl = document.getElementById("console") as HTMLDivElement;
-let step = 0;
+function startTyping() {
+  const consoleEl = document.getElementById("console") as HTMLDivElement;
+  if (!consoleEl) return;
 
-function addLine(html: string): HTMLDivElement {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  consoleEl.appendChild(div);
-  return div;
-}
+  // Reset
+  consoleEl.innerHTML = "";
+  let step = 0;
 
-function runStep(): void {
-  if (step >= lines.length) return;
-  const s = lines[step];
-
-  if (s.type === "empty") {
-    addLine("&nbsp;");
-    step++;
-    setTimeout(runStep, 40);
-
-  } else if (s.type === "prompt") {
-    addLine(`<span class="prompt-text">${PROMPT}</span>`);
-    step++;
-    setTimeout(runStep, 0);
-
-  } else if (s.type === "command") {
-    const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
-    let i = 0;
-    const text = s.text ?? "";
-    const interval = setInterval(() => {
-      i = Math.min(i + 1, text.length);
-      lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${text.substring(0, i)}`;
-      if (i >= text.length) {
-        clearInterval(interval);
-        step++;
-        setTimeout(runStep, 150);
-      }
-    }, 40);
-
-  } else if (s.type === "output") {
-    const div = addLine("");
-    let i = 0;
-    const text = s.text ?? "";
-    const interval = setInterval(() => {
-      i = Math.min(i + 2, text.length);
-      div.textContent = text.substring(0, i);
-      if (i >= text.length) {
-        clearInterval(interval);
-        step++;
-        setTimeout(runStep, 30);
-      }
-    }, 18);
-
-  } else if (s.type === "nav") {
+  function addLine(html: string): HTMLDivElement {
     const div = document.createElement("div");
-    div.innerHTML = `&nbsp;&nbsp;<a href="/posts">/posts</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/tags">/tags</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/about">/about</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
+    div.innerHTML = html;
     consoleEl.appendChild(div);
-    step++;
-    setTimeout(runStep, 80);
-
-  } else if (s.type === "cursor") {
-    const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
-    const cursor = document.createElement("span");
-    cursor.className = "cursor";
-    cursor.textContent = "█";
-    lastDiv.appendChild(cursor);
+    return div;
   }
+
+  function runStep(): void {
+    if (step >= lines.length) return;
+    const s = lines[step];
+
+    if (s.type === "empty") {
+      addLine("&nbsp;");
+      step++;
+      setTimeout(runStep, 40);
+
+    } else if (s.type === "prompt") {
+      addLine(`<span class="prompt-text">${PROMPT}</span>`);
+      step++;
+      setTimeout(runStep, 0);
+
+    } else if (s.type === "command") {
+      const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
+      let i = 0;
+      const text = s.text ?? "";
+      const interval = setInterval(() => {
+        i = Math.min(i + 1, text.length);
+        lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${text.substring(0, i)}`;
+        if (i >= text.length) {
+          clearInterval(interval);
+          step++;
+          setTimeout(runStep, 150);
+        }
+      }, 40);
+
+    } else if (s.type === "output") {
+      const div = addLine("");
+      let i = 0;
+      const text = s.text ?? "";
+      const interval = setInterval(() => {
+        i = Math.min(i + 2, text.length);
+        div.textContent = text.substring(0, i);
+        if (i >= text.length) {
+          clearInterval(interval);
+          step++;
+          setTimeout(runStep, 30);
+        }
+      }, 18);
+
+    } else if (s.type === "nav") {
+      const div = document.createElement("div");
+      div.innerHTML = `&nbsp;&nbsp;<a href="/posts">/posts</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/tags">/tags</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/about">/about</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
+      consoleEl.appendChild(div);
+      step++;
+      setTimeout(runStep, 80);
+
+    } else if (s.type === "cursor") {
+      const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
+      const cursor = document.createElement("span");
+      cursor.className = "cursor";
+      cursor.textContent = "█";
+      lastDiv.appendChild(cursor);
+    }
+  }
+
+  runStep();
 }
 
-runStep();
+// Lance au chargement initial ET à chaque navigation Astro
+document.addEventListener("astro:page-load", startTyping);
 </script>
 
 <style>
@@ -125,11 +135,7 @@ runStep();
     background-color: #0a0a0a !important;
   }
 
-  /* Header - cible toutes les variantes possibles */
-  :global(header),
-  :global(header.app-layout),
-  :global([class*="header"]),
-  :global(#main-header) {
+  :global(header) {
     background: #0a0a0a !important;
     background-color: #0a0a0a !important;
     border-bottom: 1px solid #1a1a1a !important;
@@ -146,8 +152,7 @@ runStep();
     fill: none !important;
   }
 
-  :global(footer),
-  :global(footer.app-layout) {
+  :global(footer) {
     background: #0a0a0a !important;
     background-color: #0a0a0a !important;
     border-top: 1px solid #1a1a1a !important;
@@ -155,6 +160,13 @@ runStep();
 
   :global(footer *) { color: #444 !important; }
   :global(footer a) { color: #00c832 !important; }
+
+  :global(:root),
+  :global([data-theme]),
+  :global(html) {
+    --background: #0a0a0a !important;
+    --color-background: #0a0a0a !important;
+  }
 
   #hero {
     min-height: calc(100vh - 120px);
@@ -185,18 +197,12 @@ runStep();
     border-bottom-color: #00ff41;
   }
 
-:global(.cursor) {
+  :global(.cursor) {
     animation: blink 1s step-end infinite;
   }
 
   @keyframes blink {
     0%, 100% { opacity: 1; }
     50%       { opacity: 0; }
-  }
-  :global(:root),
-  :global([data-theme]),
-  :global(html) {
-    --background: #0a0a0a !important;
-    --color-background: #0a0a0a !important;
   }
 </style>
