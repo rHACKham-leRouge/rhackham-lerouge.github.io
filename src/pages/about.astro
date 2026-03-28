@@ -29,8 +29,8 @@ const faq = [
         "Cybersecurity offers a constant challenge, where there is always something new to learn and understand.",
         "It also gave me a sense of purpose and usefulness.",
         "Helping to keep the people around me safer is truly rewarding.",
-        "Maybe that’s what it means to truly enjoy what you do.",
-        "Not because it’s easy, but because it feels worth it."]
+        "Maybe that's what it means to truly enjoy what you do.",
+        "Not because it's easy, but because it feels worth it."]
   },
   {
     q: "What is my approach to learning?",
@@ -80,7 +80,6 @@ const faq = [
 ];
 
 const lines: Array<{type: string, text?: string}> = [
-  // About Me
   { type: "prompt" },
   { type: "command", text: "cat about.txt" },
   { type: "empty" },
@@ -107,7 +106,6 @@ const lines: Array<{type: string, text?: string}> = [
   { type: "output", text: "habits, and responsibility. And I feel it is my duty to help" },
   { type: "output", text: "protect those who can't protect themselves." },
   { type: "empty" },
-  // FAQ
   { type: "prompt" },
   { type: "command", text: "Q&A --help" },
   { type: "empty" },
@@ -115,7 +113,6 @@ const lines: Array<{type: string, text?: string}> = [
   { type: "empty" },
   { type: "faq" },
   { type: "empty" },
-  // Let's connect
   { type: "prompt" },
   { type: "command", text: "ls /contact" },
   { type: "empty" },
@@ -134,7 +131,8 @@ const lines: Array<{type: string, text?: string}> = [
 function startTyping() {
   const consoleEl = document.getElementById("console-about") as HTMLDivElement;
   if (!consoleEl) return;
-  consoleEl.innerHTML = "";
+  // Si déjà du contenu, ne pas relancer
+  if (consoleEl.children.length > 0) return;
   let step = 0;
 
   function addLine(html: string): HTMLDivElement {
@@ -250,12 +248,7 @@ function startTyping() {
   runStep();
 }
 
-let hasStarted = false;
-document.addEventListener("astro:page-load", () => {
-  if (hasStarted) return;
-  hasStarted = true;
-  startTyping();
-});
+document.addEventListener("astro:page-load", startTyping);
 </script>
 
 <style>
