@@ -250,7 +250,12 @@ function startTyping() {
   runStep();
 }
 
-document.addEventListener("astro:page-load", startTyping, { once: true });
+let hasStarted = false;
+document.addEventListener("astro:page-load", () => {
+  if (hasStarted) return;
+  hasStarted = true;
+  startTyping();
+});
 </script>
 
 <style>
