@@ -131,8 +131,9 @@ const lines: Array<{type: string, text?: string}> = [
 function startTyping() {
   const consoleEl = document.getElementById("console-about") as HTMLDivElement;
   if (!consoleEl) return;
-  // Si déjà du contenu, ne pas relancer
-  if (consoleEl.children.length > 0) return;
+  if ((window as any).__aboutStarted) return;
+  (window as any).__aboutStarted = true;
+  consoleEl.innerHTML = "";
   let step = 0;
 
   function addLine(html: string): HTMLDivElement {
