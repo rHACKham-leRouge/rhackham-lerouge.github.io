@@ -17,7 +17,70 @@ import Footer from "@/components/Footer.astro";
 <script>
 const PROMPT = "rHACKham@leRouge:~$ ";
 
+const faq = [
+  {
+    q: "Why did I choose cybersecurity?",
+    a: ["I started this journey for the wrong reasons.",
+        "I was told there would be many job opportunities and high salaries.",
+        "I later found out that things are not that simple...",
+        "What started as curiosity and opportunity quickly became something more.",
+        "I quickly developed a real passion for this field. I wanted to understand everything:",
+        "how systems work, how vulnerabilities appear, and how attackers exploit them.",
+        "Cybersecurity offers a constant challenge, where there is always something new to learn and understand.",
+        "It also gave me a sense of purpose and usefulness.",
+        "Helping to keep the people around me safer is truly rewarding.",
+        "Maybe that’s what it means to truly enjoy what you do.",
+        "Not because it’s easy, but because it feels worth it."]
+  },
+  {
+    q: "What is my approach to learning?",
+    a: ["I focus on hands-on practice.",
+        "Instead of only consuming content, I actively work on real-world scenarios.",
+        "I learn by doing — breaking things, analyzing them, and understanding each step.",
+        "Discipline plays a key role in my progression.",
+        "Consistency matters more than intensity."]
+  },
+  {
+    q: "What do I actually do?",
+    a: ["I train regularly on Hack The Box and TryHackMe.",
+        "My current focus includes:",
+        "  > Privilege escalation (Linux & Windows)",
+        "  > Active Directory fundamentals and attack paths",
+        "  > Network enumeration and exploitation",
+        "  > Web vulnerabilities and misconfigurations",
+        "I also participate in CTF challenges to develop problem-solving skills.",
+        "My goal is not just to solve challenges, but to deeply understand",
+        "how and why each technique works."]
+  },
+  {
+    q: "Why cyber defense and ESNA?",
+    a: ["My objective is to specialize in cyber defense.",
+        "Understanding how attacks work is essential to building effective defenses.",
+        "That is why I approach cybersecurity from an offensive perspective first —",
+        "to better anticipate and prevent real-world threats.",
+        "Joining ESNA represents an important step in that journey."]
+  },
+  {
+    q: "What are my goals?",
+    a: ["I am currently working toward:",
+        "  > eJPT (entry-level penetration testing)",
+        "  > CPTS (Hack The Box certification)",
+        "  > OSCP (long-term goal)",
+        "These certifications are milestones, not endpoints.",
+        "My main focus is building real, applicable skills."]
+  },
+  {
+    q: "Why this blog?",
+    a: ["This blog is where I document my progression.",
+        "I use it to share what I learn, break down complex topics,",
+        "and build a structured understanding of cybersecurity concepts.",
+        "Writing forces clarity — and clarity is essential in this field.",
+        "If it helps others along the way, even better."]
+  },
+];
+
 const lines: Array<{type: string, text?: string}> = [
+  // About Me
   { type: "prompt" },
   { type: "command", text: "cat about.txt" },
   { type: "empty" },
@@ -44,6 +107,26 @@ const lines: Array<{type: string, text?: string}> = [
   { type: "output", text: "habits, and responsibility. And I feel it is my duty to help" },
   { type: "output", text: "protect those who can't protect themselves." },
   { type: "empty" },
+  // FAQ
+  { type: "prompt" },
+  { type: "command", text: "Q&A --help" },
+  { type: "empty" },
+  { type: "title", text: "[ Questions & Answers ]" },
+  { type: "empty" },
+  { type: "faq" },
+  { type: "empty" },
+  // Let's connect
+  { type: "prompt" },
+  { type: "command", text: "ls /contact" },
+  { type: "empty" },
+  { type: "title", text: "[ Let's Connect ]" },
+  { type: "empty" },
+  { type: "output", text: "If you are on a similar path, working on CTFs," },
+  { type: "output", text: "or building your skills in cybersecurity, feel free to reach out." },
+  { type: "output", text: "Learning is better when it is shared." },
+  { type: "empty" },
+  { type: "contact" },
+  { type: "empty" },
   { type: "prompt" },
   { type: "cursor" },
 ];
@@ -69,10 +152,12 @@ function startTyping() {
       addLine("&nbsp;");
       step++;
       setTimeout(runStep, 40);
+
     } else if (s.type === "prompt") {
       addLine(`<span class="prompt-text">${PROMPT}</span>`);
       step++;
       setTimeout(runStep, 0);
+
     } else if (s.type === "command") {
       const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
       let i = 0;
@@ -86,9 +171,12 @@ function startTyping() {
           setTimeout(runStep, 150);
         }
       }, 40);
+
     } else if (s.type === "title") {
-      addLine(`<div style="font-size:22px; letter-spacing:6px; color:#00ff41; font-weight:bold;">${s.text}</div>`);      step++;
+      addLine(`<div style="font-size:22px; letter-spacing:6px; color:#00ff41; font-weight:bold;">${s.text}</div>`);
+      step++;
       setTimeout(runStep, 80);
+
     } else if (s.type === "output") {
       const div = addLine("");
       div.style.color = "#e0e0e0";
@@ -103,6 +191,53 @@ function startTyping() {
           setTimeout(runStep, 20);
         }
       }, 16);
+
+    } else if (s.type === "faq") {
+      faq.forEach((item) => {
+        const wrapper = document.createElement("div");
+        wrapper.style.marginBottom = "4px";
+
+        const question = document.createElement("div");
+        question.style.color = "#00ff41";
+        question.style.cursor = "pointer";
+        question.style.userSelect = "none";
+        question.innerHTML = `<span style="color:#555;">▶</span> ${item.q}`;
+
+        const answer = document.createElement("div");
+        answer.style.display = "none";
+        answer.style.color = "#e0e0e0";
+        answer.style.paddingLeft = "1.5rem";
+        answer.style.marginTop = "4px";
+        answer.style.marginBottom = "8px";
+        item.a.forEach(line => {
+          const p = document.createElement("div");
+          p.textContent = line;
+          answer.appendChild(p);
+        });
+
+        question.addEventListener("click", () => {
+          const isOpen = answer.style.display !== "none";
+          answer.style.display = isOpen ? "none" : "block";
+          const arrow = question.querySelector("span");
+          if (arrow) arrow.textContent = isOpen ? "▶" : "▼";
+        });
+
+        wrapper.appendChild(question);
+        wrapper.appendChild(answer);
+        consoleEl.appendChild(wrapper);
+      });
+
+      step++;
+      setTimeout(runStep, 80);
+
+    } else if (s.type === "contact") {
+      const div = document.createElement("div");
+      div.innerHTML = `  <a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
+      div.style.color = "#e0e0e0";
+      consoleEl.appendChild(div);
+      step++;
+      setTimeout(runStep, 80);
+
     } else if (s.type === "cursor") {
       const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
       const cursor = document.createElement("span");
@@ -144,16 +279,14 @@ document.addEventListener("astro:page-load", startTyping);
   :global(footer *) { color: #444 !important; }
   :global(footer a) { color: #00c832 !important; }
 
-  :global(:root) {
-    --background: #0a0a0a !important;
-  }
+  :global(:root) { --background: #0a0a0a !important; }
 
   #hero {
     min-height: calc(100vh - 120px);
     padding: 3rem 2rem;
   }
 
-  #console {
+  #console-about {
     font-family: 'Share Tech Mono', 'Courier New', monospace;
     font-size: 16px;
     line-height: 1.8;
@@ -161,8 +294,16 @@ document.addEventListener("astro:page-load", startTyping);
     max-width: 800px;
   }
 
-  #console .prompt-text { color: #00c832; }
-  #console .section-title { color: #00ff41; font-weight: bold; letter-spacing: 2px; }
+  #console-about .prompt-text { color: #00c832; }
+
+  #console-about a {
+    color: #00ff41;
+    text-decoration: none;
+    border-bottom: 1px solid #004400;
+    transition: color 0.2s;
+  }
+
+  #console-about a:hover { color: #fff; }
 
   :global(.cursor) { animation: blink 1s step-end infinite; }
 
@@ -170,8 +311,4 @@ document.addEventListener("astro:page-load", startTyping);
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
   }
-  #console-about {
-    color: #00ff41 !important;
-  }
-  
 </style>
