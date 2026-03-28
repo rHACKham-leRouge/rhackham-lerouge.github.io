@@ -1,0 +1,177 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+---
+
+<Layout title="About — rHACKham-le-Rouge">
+  <Header />
+  <main id="main-content" class="app-layout">
+    <section id="hero">
+      <div id="console-about"></div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+const PROMPT = "rHACKham@leRouge:~$ ";
+
+const lines: Array<{type: string, text?: string}> = [
+  { type: "prompt" },
+  { type: "command", text: "cat about.txt" },
+  { type: "empty" },
+  { type: "title", text: "[ About Me ]" },
+  { type: "empty" },
+  { type: "output", text: "I didn't get into cybersecurity by following a clear path." },
+  { type: "output", text: "With no academic background or prior skills in this field," },
+  { type: "output", text: "I had to build everything from the ground up, step by step," },
+  { type: "output", text: "through challenges, successes (sometimes failures)," },
+  { type: "output", text: "and most importantly, PERSISTENCE." },
+  { type: "empty" },
+  { type: "output", text: "My goal is to develop strong and well-rounded skills that allow" },
+  { type: "output", text: "me to understand how computer systems are attacked," },
+  { type: "output", text: "and how to protect them effectively." },
+  { type: "empty" },
+  { type: "output", text: "Beyond the technical aspect, I also care about the human side" },
+  { type: "output", text: "of cybersecurity. I want to help people around me feel safer" },
+  { type: "output", text: "when using their devices and browsing the internet." },
+  { type: "output", text: "Many people don't realize how exposed they are." },
+  { type: "output", text: "Some don't know how to protect themselves, while others" },
+  { type: "output", text: "simply believe that \"it only happens to others.\"" },
+  { type: "empty" },
+  { type: "output", text: "Cybersecurity is not just about systems; it's about awareness," },
+  { type: "output", text: "habits, and responsibility. And I feel it is my duty to help" },
+  { type: "output", text: "protect those who can't protect themselves." },
+  { type: "empty" },
+  { type: "prompt" },
+  { type: "cursor" },
+];
+
+function startTyping() {
+  const consoleEl = document.getElementById("console-about") as HTMLDivElement;
+  if (!consoleEl) return;
+  consoleEl.innerHTML = "";
+  let step = 0;
+
+  function addLine(html: string): HTMLDivElement {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    consoleEl.appendChild(div);
+    return div;
+  }
+
+  function runStep(): void {
+    if (step >= lines.length) return;
+    const s = lines[step];
+
+    if (s.type === "empty") {
+      addLine("&nbsp;");
+      step++;
+      setTimeout(runStep, 40);
+    } else if (s.type === "prompt") {
+      addLine(`<span class="prompt-text">${PROMPT}</span>`);
+      step++;
+      setTimeout(runStep, 0);
+    } else if (s.type === "command") {
+      const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
+      let i = 0;
+      const text = s.text ?? "";
+      const interval = setInterval(() => {
+        i = Math.min(i + 1, text.length);
+        lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${text.substring(0, i)}`;
+        if (i >= text.length) {
+          clearInterval(interval);
+          step++;
+          setTimeout(runStep, 150);
+        }
+      }, 40);
+    } else if (s.type === "title") {
+      addLine(`<div style="font-size:22px; letter-spacing:6px; color:#00ff41; font-weight:bold;">${s.text}</div>`);      step++;
+      setTimeout(runStep, 80);
+    } else if (s.type === "output") {
+      const div = addLine("");
+      div.style.color = "#e0e0e0";
+      let i = 0;
+      const text = s.text ?? "";
+      const interval = setInterval(() => {
+        i = Math.min(i + 2, text.length);
+        div.textContent = text.substring(0, i);
+        if (i >= text.length) {
+          clearInterval(interval);
+          step++;
+          setTimeout(runStep, 20);
+        }
+      }, 16);
+    } else if (s.type === "cursor") {
+      const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
+      const cursor = document.createElement("span");
+      cursor.className = "cursor";
+      cursor.textContent = "█";
+      lastDiv.appendChild(cursor);
+    }
+  }
+
+  runStep();
+}
+
+document.addEventListener("astro:page-load", startTyping);
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :global(body), :global(html) {
+    background: #0a0a0a !important;
+  }
+
+  :global(header) {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) { color: #00ff41 !important; }
+  :global(header svg), :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer) {
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  :global(:root) {
+    --background: #0a0a0a !important;
+  }
+
+  #hero {
+    min-height: calc(100vh - 120px);
+    padding: 3rem 2rem;
+  }
+
+  #console {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #00ff41;
+    max-width: 800px;
+  }
+
+  #console .prompt-text { color: #00c832; }
+  #console .section-title { color: #00ff41; font-weight: bold; letter-spacing: 2px; }
+
+  :global(.cursor) { animation: blink 1s step-end infinite; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  #console-about {
+    color: #00ff41 !important;
+  }
+  
+</style>
