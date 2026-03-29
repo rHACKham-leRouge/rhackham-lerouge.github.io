@@ -241,8 +241,12 @@ function startTyping() {
 
     } else if (s.type === "contact") {
       const div = document.createElement("div");
-      div.innerHTML = `  <a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
       div.style.color = "#e0e0e0";
+      div.innerHTML = `
+        <div>&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a></div>
+        <div>&nbsp;&nbsp;<a href="https://app.hackthebox.com/public/users/2203617" target="_blank">hackthebox.com → rHACKham-leRouge</a></div>
+        <div>&nbsp;&nbsp;<a href="mailto:rh4ck4m_l3_r0uge@proton.me">rh4ck4m_l3_r0uge@proton.me</a></div>
+      `;
       consoleEl.appendChild(div);
       step++;
       setTimeout(runStep, 80);
