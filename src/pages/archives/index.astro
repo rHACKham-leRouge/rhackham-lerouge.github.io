@@ -1,83 +1,169 @@
 ---
 import { getCollection } from "astro:content";
-import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Card from "@/components/Card.astro";
 import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
 import { SITE } from "@/config";
 
-// Redirect to 404 page if `showArchives` config is false
 if (!SITE.showArchives) {
   return Astro.redirect("/404");
 }
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
-
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
+
+const grouped = Object.entries(
+  getPostsByGroupCondition(posts, post => post.data.pubDatetime.getFullYear())
+).sort(([yearA], [yearB]) => Number(yearB) - Number(yearA));
 ---
 
 <Layout title={`Archives | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Archives" pageDesc="All the articles I've archived.">
-    {
-      Object.entries(
-        getPostsByGroupCondition(posts, post =>
-          post.data.pubDatetime.getFullYear()
-        )
-      )
-        .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
-        .map(([year, yearGroup]) => (
-          <div>
-            <span class="text-2xl font-bold">{year}</span>
-            <sup class="text-sm">{yearGroup.length}</sup>
+  <main id="main-content" class="app-layout">
+    <section id="hero">
+      <div id="console-archives">
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cmd">find posts/ -type f | sort -r</span>
+        </div>
+        <div class="empty">&nbsp;</div>
+
+        {grouped.map(([year, yearGroup]) => (
+          <div class="year-group">
+            <div class="year-header">
+              <span class="year">{year}</span>
+              <span class="count"> ({yearGroup.length} post{yearGroup.length > 1 ? "s" : ""})</span>
+            </div>
             {Object.entries(
-              getPostsByGroupCondition(
-                yearGroup,
-                post => post.data.pubDatetime.getMonth() + 1
-              )
+              getPostsByGroupCondition(yearGroup, post => post.data.pubDatetime.getMonth() + 1)
             )
               .sort(([monthA], [monthB]) => Number(monthB) - Number(monthA))
               .map(([month, monthGroup]) => (
-                <div class="flex flex-col sm:flex-row">
-                  <div class="mt-6 min-w-36 text-lg sm:my-6">
-                    <span class="font-bold">{months[Number(month) - 1]}</span>
-                    <sup class="text-xs">{monthGroup.length}</sup>
-                  </div>
-                  <ul>
+                <div class="month-group">
+                  <div class="month-header">-- {months[Number(month) - 1]} --</div>
+                  <ul class="post-list">
                     {monthGroup
-                      .sort(
-                        (a, b) =>
-                          Math.floor(
-                            new Date(b.data.pubDatetime).getTime() / 1000
-                          ) -
-                          Math.floor(
-                            new Date(a.data.pubDatetime).getTime() / 1000
-                          )
+                      .sort((a, b) =>
+                        new Date(b.data.pubDatetime).getTime() - new Date(a.data.pubDatetime).getTime()
                       )
-                      .map(data => (
-                        <Card {...data} />
+                      .map(({ id, data }) => (
+                        <li class="post-item">
+                          <a href={`/posts/${id}`} class="post-link">
+                            <span class="post-date">[{new Date(data.pubDatetime).toISOString().slice(0, 10)}]</span>
+                            <span class="post-title">{data.title}</span>
+                          </a>
+                          {data.description && (
+                            <div class="post-desc">// {data.description}</div>
+                          )}
+                        </li>
                       ))}
                   </ul>
                 </div>
               ))}
           </div>
-        ))
-    }
-  </Main>
+        ))}
+
+        <div class="empty">&nbsp;</div>
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cursor">█</span>
+        </div>
+      </div>
+    </section>
+  </main>
   <Footer />
 </Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :global(body), :global(html) {
+    background: #0a0a0a !important;
+  }
+
+  :global(header) {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) { color: #00ff41 !important; }
+  :global(header svg), :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer) {
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  :global(:root) { --background: #0a0a0a !important; }
+
+  #hero {
+    min-height: calc(100vh - 120px);
+    padding: 3rem 2rem;
+  }
+
+  #console-archives {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #00ff41;
+    max-width: 800px;
+  }
+
+  .prompt-text { color: #00c832; }
+  .cmd { color: #e0e0e0; }
+  .empty { height: 1.1em; display: block; }
+
+  .year-group { margin-bottom: 1.5rem; }
+
+  .year-header { margin-bottom: 0.5rem; }
+  .year { color: #00ff41; font-size: 18px; font-weight: bold; }
+  .count { color: #00ff41; font-size: 14px; }
+
+  .month-group { margin-bottom: 1rem; padding-left: 1rem; }
+  .month-header { color: #00ff41; margin-bottom: 0.3rem; }
+
+  .post-list { list-style: none; padding: 0; margin: 0; }
+  .post-item { margin-bottom: 0.8rem; padding-left: 1rem; }
+
+  .post-link {
+    display: block;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .post-date { color: #00ff41; margin-right: 1rem; }
+
+  .post-title {
+    color: #6699ff;
+    border-bottom: 1px solid #334488;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .post-link:hover .post-title {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+
+  .post-desc {
+    color: #e0e0e0;
+    font-size: 14px;
+    padding-left: 1rem;
+  }
+
+  .cursor { animation: blink 1s step-end infinite; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>

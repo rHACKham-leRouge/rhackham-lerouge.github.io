@@ -1,6 +1,5 @@
 ---
 import "@pagefind/default-ui/css/ui.css";
-import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -11,9 +10,23 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 
 <Layout title={`Search | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Search" pageDesc="Search any article ...">
-    <div id="pagefind-search" transition:persist data-backurl={backUrl}></div>
-  </Main>
+  <main id="main-content" class="app-layout">
+    <section id="hero">
+      <div id="console-search">
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cmd">grep -r "</span><span class="cursor-inline">█</span><span class="cmd">" posts/</span>
+        </div>
+        <div class="empty">&nbsp;</div>
+        {import.meta.env.DEV && (
+          <div class="dev-warning">
+            // DEV mode: run <span class="cmd">npm run build</span> to enable search
+          </div>
+        )}
+        <div id="pagefind-search" transition:persist data-backurl={backUrl}></div>
+      </div>
+    </section>
+  </main>
   <Footer />
 </Layout>
 
@@ -32,24 +45,13 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       // @ts-expect-error — Missing types for @pagefind/default-ui package.
       const { PagefindUI } = await import("@pagefind/default-ui");
 
-      // Display warning inn dev mode
-      if (import.meta.env.DEV) {
-        pageFindSearch.innerHTML = `
-            <div class="bg-muted/75 rounded p-4 space-y-4 mb-4">
-              <p><strong>DEV mode Warning! </strong>You need to build the project at least once to see the search results during development.</p>
-              <code class="block bg-black text-white px-2 py-1 rounded">pnpm run build</code>
-            </div>
-          `;
-      }
-
-      // Init pagefind ui
       const search = new PagefindUI({
         element: "#pagefind-search",
         showImages: false,
         showSubResults: true,
         processTerm: function (term: string) {
-          params.set("q", term); // Update the `q` parameter in the URL
-          history.replaceState(history.state, "", "?" + params.toString()); // Push the new URL without reloading
+          params.set("q", term);
+          history.replaceState(history.state, "", "?" + params.toString());
 
           const backUrl = pageFindSearch?.dataset?.backurl;
           sessionStorage.setItem("backUrl", backUrl + "?" + params.toString());
@@ -58,13 +60,11 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
         },
       });
 
-      // If search param exists (eg: search?q=astro), trigger search
       const query = params.get("q");
       if (query) {
         search.triggerSearch(query);
       }
 
-      // Reset search param if search input is cleared
       const searchInput = document.querySelector(".pagefind-ui__search-input");
       const clearButton = document.querySelector(".pagefind-ui__search-clear");
       searchInput?.addEventListener("input", resetSearchParam);
@@ -80,62 +80,123 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
 
   document.addEventListener("astro:after-swap", () => {
     const pagefindSearch = document.querySelector("#pagefind-search");
-
-    // if pagefind search form already exists, don't initialize search component
     if (pagefindSearch && pagefindSearch.querySelector("form")) return;
-
     initSearch();
   });
   initSearch();
 </script>
 
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :global(body), :global(html) {
+    background: #0a0a0a !important;
+  }
+
+  :global(header) {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) { color: #00ff41 !important; }
+  :global(header svg), :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer) {
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  :global(:root) { --background: #0a0a0a !important; }
+
+  #hero {
+    min-height: calc(100vh - 120px);
+    padding: 3rem 2rem;
+  }
+
+  #console-search {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #00ff41;
+    max-width: 800px;
+  }
+
+  .prompt-text { color: #00c832; }
+  .cmd { color: #e0e0e0; }
+  .empty { height: 1.1em; display: block; }
+
+  .dev-warning {
+    color: #555;
+    margin-bottom: 1rem;
+  }
+
+  .cursor-inline {
+    animation: blink 1s step-end infinite;
+    color: #00ff41;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
+
 <style is:global>
   #pagefind-search {
-    --pagefind-ui-font: var(--font-app);
-    --pagefind-ui-text: var(--foreground);
-    --pagefind-ui-background: var(--background);
-    --pagefind-ui-border: var(--border);
-    --pagefind-ui-primary: var(--accent);
-    --pagefind-ui-tag: var(--background);
-    --pagefind-ui-border-radius: 0.375rem;
+    --pagefind-ui-font: 'Share Tech Mono', monospace;
+    --pagefind-ui-text: #e0e0e0;
+    --pagefind-ui-background: #0a0a0a;
+    --pagefind-ui-border: #1a1a1a;
+    --pagefind-ui-primary: #00ff41;
+    --pagefind-ui-tag: #0a0a0a;
+    --pagefind-ui-border-radius: 0;
     --pagefind-ui-border-width: 1px;
-    --pagefind-ui-image-border-radius: 8px;
-    --pagefind-ui-image-box-ratio: 3 / 2;
 
     form::before {
-      background-color: var(--foreground);
+      background-color: #00ff41;
     }
 
     input {
       font-weight: 400;
-      border: 1px solid var(--border);
+      border: 1px solid #1a1a1a;
+      background: #111;
+      color: #e0e0e0;
     }
 
     input:focus-visible {
-      outline: 1px solid var(--accent);
+      outline: 1px solid #00ff41;
     }
 
     .pagefind-ui__result-title a {
-      color: var(--accent);
-      outline-offset: 1px;
-      outline-color: var(--accent);
+      color: #6699ff;
       text-decoration-style: dashed;
       text-underline-offset: 4px;
     }
 
-    .pagefind-ui__result-title a:focus-visible,
-    .pagefind-ui__search-clear:focus-visible {
-      text-decoration-line: none;
-      outline-width: 2px;
-      outline-style: dashed;
+    .pagefind-ui__result-title a:hover {
+      color: #fff;
+    }
+
+    .pagefind-ui__result-excerpt {
+      color: #e0e0e0;
+    }
+
+    .pagefind-ui__result {
+      border-color: #1a1a1a;
     }
 
     .pagefind-ui__result:last-of-type {
       border-bottom: 0;
     }
 
-    .pagefind-ui__result-nested .pagefind-ui__result-link:before {
-      font-family: system-ui;
+    .pagefind-ui__message {
+      color: #555;
     }
   }
 </style>

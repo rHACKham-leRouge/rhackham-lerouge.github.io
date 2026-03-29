@@ -1,11 +1,9 @@
 ---
 import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
-import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Card from "@/components/Card.astro";
 import Pagination from "@/components/Pagination.astro";
 import getSortedPosts from "@/utils/getSortedPosts";
 import { SITE } from "@/config";
@@ -20,13 +18,141 @@ const { page } = Astro.props;
 
 <Layout title={`Posts | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Posts" pageDesc="All the articles I've posted.">
-    <ul>
-      {page.data.map(data => <Card {...data} />)}
-    </ul>
-  </Main>
-
+  <main id="main-content" class="app-layout">
+    <section id="hero">
+      <div id="console-posts">
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cmd">ls posts/</span>
+        </div>
+        <div class="empty">&nbsp;</div>
+        {page.data.length === 0 ? (
+          <div class="no-posts">// No posts yet. Stay tuned.</div>
+        ) : (
+          <ul class="post-list">
+            {page.data.map(({ id, data }) => (
+              <li class="post-item">
+                <a href={`/posts/${id}`} class="post-link">
+                  <span class="post-date">[{new Date(data.pubDatetime).toISOString().slice(0, 10)}]</span>
+                  <span class="post-title">{data.title}</span>
+                </a>
+                {data.description && (
+                  <div class="post-desc">// {data.description}</div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        <div class="empty">&nbsp;</div>
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cursor">█</span>
+        </div>
+      </div>
+    </section>
+  </main>
   <Pagination {page} />
-
   <Footer noMarginTop={page.lastPage > 1} />
 </Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :global(body), :global(html) {
+    background: #0a0a0a !important;
+  }
+
+  :global(header) {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) { color: #00ff41 !important; }
+  :global(header svg), :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer) {
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  :global(:root) { --background: #0a0a0a !important; }
+
+  #hero {
+    min-height: calc(100vh - 120px);
+    padding: 3rem 2rem;
+  }
+
+  #console-posts {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #00ff41;
+    max-width: 800px;
+  }
+
+  .prompt-text { color: #00c832; }
+  .cmd { color: #e0e0e0; }
+  .empty { height: 1.1em; display: block; }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .post-item {
+    margin-bottom: 1rem;
+  }
+
+  .post-link {
+    display: block;
+    text-decoration: none;
+    color: #6699ff;
+    transition: color 0.2s;
+  }
+
+  .post-link:hover {
+    color: #fff;
+  }
+
+  .post-date {
+    color: #00ff41;
+    margin-right: 1rem;
+  }
+
+  .post-title {
+    color: #6699ff;
+    border-bottom: 1px solid #334488;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .post-link:hover .post-title {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+
+  .post-desc {
+    color: #e0e0e0;
+    font-size: 14px;
+    padding-left: 1rem;
+  }
+
+  .no-posts {
+    color: #555;
+  }
+
+  .cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
