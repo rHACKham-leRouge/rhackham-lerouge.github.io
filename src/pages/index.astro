@@ -35,7 +35,7 @@ const lines: Array<{type: string, text?: string}> = [
   { type: "prompt" },
   { type: "command", text: "ls interests/" },
   { type: "empty" },
-  { type: "output", text: "  /Cybersecurity  /OSINT  /History  /Martial_Arts  /Nature  /Scuba_Diving" },
+  { type: "dirs", text: "  /Cybersecurity  /OSINT  /History  /Martial_Arts  /Nature  /Scuba_Diving" },
   { type: "empty" },
   { type: "prompt" },
   { type: "command", text: "ls navigation/" },
@@ -50,7 +50,6 @@ function startTyping() {
   const consoleEl = document.getElementById("console") as HTMLDivElement;
   if (!consoleEl) return;
 
-  // Reset
   consoleEl.innerHTML = "";
   let step = 0;
 
@@ -91,6 +90,22 @@ function startTyping() {
 
     } else if (s.type === "output") {
       const div = addLine("");
+      div.style.color = "#e0e0e0";
+      let i = 0;
+      const text = s.text ?? "";
+      const interval = setInterval(() => {
+        i = Math.min(i + 2, text.length);
+        div.textContent = text.substring(0, i);
+        if (i >= text.length) {
+          clearInterval(interval);
+          step++;
+          setTimeout(runStep, 30);
+        }
+      }, 18);
+
+    } else if (s.type === "dirs") {
+      const div = addLine("");
+      div.style.color = "#6699ff";
       let i = 0;
       const text = s.text ?? "";
       const interval = setInterval(() => {
@@ -105,8 +120,7 @@ function startTyping() {
 
     } else if (s.type === "nav") {
       const div = document.createElement("div");
-      div.innerHTML = `&nbsp;&nbsp;<a href="/posts">/posts</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/tags">/tags</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/about">/about</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a>`;
-      consoleEl.appendChild(div);
+div.innerHTML = `&nbsp;&nbsp;<a href="/posts" style="color:#6699ff;border-bottom:1px solid #334488;">/posts</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/tags" style="color:#6699ff;border-bottom:1px solid #334488;">/tags</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/about" style="color:#6699ff;border-bottom:1px solid #334488;">/about</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank" style="color:#6699ff;border-bottom:1px solid #334488;">github.com/rHACKham-leRouge</a>`;      consoleEl.appendChild(div);
       step++;
       setTimeout(runStep, 80);
 
@@ -122,7 +136,6 @@ function startTyping() {
   runStep();
 }
 
-// Lance au chargement initial ET à chaque navigation Astro
 document.addEventListener("astro:page-load", startTyping);
 </script>
 
@@ -186,15 +199,15 @@ document.addEventListener("astro:page-load", startTyping);
   }
 
   #console a {
-    color: #00ff41;
+    color: #6699ff;
     text-decoration: none;
-    border-bottom: 1px solid #004400;
+    border-bottom: 1px solid #334488;
     transition: color 0.2s, border-color 0.2s;
   }
 
   #console a:hover {
     color: #fff;
-    border-bottom-color: #00ff41;
+    border-bottom-color: #6699ff;
   }
 
   :global(.cursor) {
