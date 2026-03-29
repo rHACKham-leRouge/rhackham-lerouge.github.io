@@ -1,24 +1,111 @@
 ---
 import { getCollection } from "astro:content";
-import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
-import Tag from "@/components/Tag.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import getUniqueTags from "@/utils/getUniqueTags";
 import { SITE } from "@/config";
 
 const posts = await getCollection("blog");
-
-let tags = getUniqueTags(posts);
+const tags = getUniqueTags(posts);
 ---
 
 <Layout title={`Tags | ${SITE.title}`}>
   <Header />
-  <Main pageTitle="Tags" pageDesc="All the tags used in posts.">
-    <ul class="flex flex-wrap gap-6">
-      {tags.map(({ tag, tagName }) => <Tag {tag} {tagName} />)}
-    </ul>
-  </Main>
+  <main id="main-content" class="app-layout">
+    <section id="hero">
+      <div id="console-tags">
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cmd">ls tags/</span>
+        </div>
+        <div class="empty">&nbsp;</div>
+        <div class="tags-list">
+          {tags.map(({ tag, tagName }) => (
+            <a href={`/tags/${tag}`} class="tag-link">#{tagName}</a>
+          ))}
+        </div>
+        <div class="empty">&nbsp;</div>
+        <div class="prompt-line">
+          <span class="prompt-text">rHACKham@leRouge:~$ </span>
+          <span class="cursor">█</span>
+        </div>
+      </div>
+    </section>
+  </main>
   <Footer />
 </Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :global(body), :global(html) {
+    background: #0a0a0a !important;
+  }
+
+  :global(header) {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) { color: #00ff41 !important; }
+  :global(header svg), :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer) {
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  :global(:root) { --background: #0a0a0a !important; }
+
+  #hero {
+    min-height: calc(100vh - 120px);
+    padding: 3rem 2rem;
+  }
+
+  #console-tags {
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #00ff41;
+    max-width: 800px;
+  }
+
+  .prompt-text { color: #00c832; }
+  .cmd { color: #e0e0e0; }
+  .empty { height: 1.1em; display: block; }
+
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-left: 1rem;
+  }
+
+  .tag-link {
+    color: #6699ff;
+    text-decoration: none;
+    border-bottom: 1px solid #334488;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tag-link:hover {
+    color: #fff;
+    border-bottom-color: #6699ff;
+  }
+
+  .cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
