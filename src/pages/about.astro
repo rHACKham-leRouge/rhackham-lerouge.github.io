@@ -189,17 +189,9 @@ function startTyping() {
     } else if (s.type === "output") {
       const div = addLine("");
       div.style.color = "#e0e0e0";
-      let i = 0;
-      const text = s.text ?? "";
-      const interval = setInterval(() => {
-        i = Math.min(i + 2, text.length);
-        div.textContent = text.substring(0, i);
-        if (i >= text.length) {
-          clearInterval(interval);
-          step++;
-          setTimeout(runStep, 20);
-        }
-      }, 16);
+      div.textContent = s.text ?? "";
+      step++;
+      setTimeout(runStep, 20);
 
     } else if (s.type === "faq") {
       faq.forEach((item) => {

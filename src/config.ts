@@ -2,7 +2,7 @@ export const SITE = {
   website: "https://rhackham.github.io/",
   author: "rHACKham-leRouge",
   profile: "https://github.com/rHACKham-leRouge",
-  desc: "Cybersécurité, CTF, bug bounty et projets perso.",
+  desc: "Cybersecurity, OSINT, Write-ups, Reports and personnal projects",
   title: "rHACKham-le-Rouge",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
