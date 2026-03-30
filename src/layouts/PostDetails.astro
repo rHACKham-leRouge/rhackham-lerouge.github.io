@@ -39,19 +39,16 @@ const { Content } = await render(post);
 
 let ogImageUrl: string | undefined;
 
-// Determine OG image source
 if (typeof initOgImage === "string") {
-  ogImageUrl = initOgImage; // Remote OG image (absolute URL)
+  ogImageUrl = initOgImage;
 } else if (initOgImage?.src) {
-  ogImageUrl = initOgImage.src; // Local asset
+  ogImageUrl = initOgImage.src;
 }
 
-// Use dynamic OG image if enabled and no remote|local ogImage
 if (!ogImageUrl && SITE.dynamicOgImage) {
   ogImageUrl = `${getPath(post.id, post.filePath)}/index.png`;
 }
 
-// Resolve OG image URL (or fallback to SITE.ogImage / default `og.png`)
 const ogImage = ogImageUrl
   ? new URL(ogImageUrl, Astro.url.origin).href
   : undefined;
@@ -67,8 +64,6 @@ const layoutProps = {
   scrollSmooth: true,
 };
 
-/* ========== Prev/Next Posts ========== */
-
 const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
   id,
   title,
@@ -76,7 +71,6 @@ const allPosts = posts.map(({ data: { title }, id, filePath }) => ({
 }));
 
 const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
-
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
   currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
@@ -128,7 +122,6 @@ const nextPost =
 
     <hr class="my-6 border-dashed" />
 
-    <!-- Previous/Next Post Buttons -->
     <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
       {
         prevPost && (
@@ -164,29 +157,18 @@ const nextPost =
 </Layout>
 
 <script is:inline data-astro-rerun>
-  /** Create a progress indicator
-   *  at the top */
   function createProgressBar() {
-    // Create the main container div
     const progressContainer = document.createElement("div");
     progressContainer.className =
       "progress-container fixed top-0 z-10 h-1 w-full bg-background";
-
-    // Create the progress bar div
     const progressBar = document.createElement("div");
     progressBar.className = "progress-bar h-1 w-0 bg-accent";
     progressBar.id = "myBar";
-
-    // Append the progress bar to the progress container
     progressContainer.appendChild(progressBar);
-
-    // Append the progress container to the document body or any other desired parent element
     document.body.appendChild(progressContainer);
   }
   createProgressBar();
 
-  /** Update the progress bar
-   *  when user scrolls */
   function updateScrollProgress() {
     document.addEventListener("scroll", () => {
       const winScroll =
@@ -205,8 +187,6 @@ const nextPost =
   }
   updateScrollProgress();
 
-  /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
   function addHeadingLinks() {
     const headings = Array.from(
       document.querySelectorAll("h2, h3, h4, h5, h6")
@@ -217,7 +197,6 @@ const nextPost =
       link.className =
         "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
       link.href = "#" + heading.id;
-
       const span = document.createElement("span");
       span.ariaHidden = "true";
       span.innerText = "#";
@@ -227,36 +206,23 @@ const nextPost =
   }
   addHeadingLinks();
 
-  /** Attaches copy buttons to code blocks in the document,
-   * allowing users to copy code easily. */
   function attachCopyButtons() {
     const copyButtonLabel = "Copy";
     const codeBlocks = Array.from(document.querySelectorAll("pre"));
-
     for (const codeBlock of codeBlocks) {
       const wrapper = document.createElement("div");
       wrapper.style.position = "relative";
-
-      // Check if --file-name-offset custom property exists
       const computedStyle = getComputedStyle(codeBlock);
       const hasFileNameOffset =
         computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
-
-      // Determine the top positioning class
-      const topClass = hasFileNameOffset
-        ? "top-(--file-name-offset)"
-        : "-top-3";
-
+      const topClass = hasFileNameOffset ? "top-(--file-name-offset)" : "-top-3";
       const copyButton = document.createElement("button");
       copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
       copyButton.innerHTML = copyButtonLabel;
       codeBlock.setAttribute("tabindex", "0");
       codeBlock.appendChild(copyButton);
-
-      // wrap codebock with relative parent element
       codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
       wrapper.appendChild(codeBlock);
-
       copyButton.addEventListener("click", async () => {
         await copyCode(codeBlock, copyButton);
       });
@@ -265,12 +231,8 @@ const nextPost =
     async function copyCode(block, button) {
       const code = block.querySelector("code");
       const text = code?.innerText;
-
       await navigator.clipboard.writeText(text ?? "");
-
-      // visual feedback that task is completed
       button.innerText = "Copied";
-
       setTimeout(() => {
         button.innerText = copyButtonLabel;
       }, 700);
@@ -278,8 +240,82 @@ const nextPost =
   }
   attachCopyButtons();
 
-  /* Go to page start after page swap */
   document.addEventListener("astro:after-swap", () =>
     window.scrollTo({ left: 0, top: 0, behavior: "instant" })
   );
 </script>
+
+<style>
+  :global(body), :global(html) {
+    background: #0a0a0a !important;
+    color: #e0e0e0;
+  }
+
+  :global(header) {
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a !important;
+    box-shadow: none !important;
+  }
+
+  :global(header *) { color: #00ff41 !important; }
+  :global(header svg), :global(header svg *) {
+    stroke: #00ff41 !important;
+    fill: none !important;
+  }
+
+  :global(footer) {
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a !important;
+  }
+  :global(footer *) { color: #444 !important; }
+  :global(footer a) { color: #00c832 !important; }
+
+  :global(:root) { --background: #0a0a0a !important; }
+
+  :global(#article h1),
+  :global(#article h2),
+  :global(#article h3),
+  :global(#article h4) {
+    color: #00ff41 !important;
+  }
+
+  :global(#article p),
+  :global(#article li) {
+    color: #e0e0e0 !important;
+  }
+
+  :global(#article a) {
+    color: #6699ff !important;
+  }
+
+  :global(#article code) {
+    color: #00ff41 !important;
+    background: #111 !important;
+  }
+
+  :global(#article table) {
+    color: #e0e0e0 !important;
+  }
+
+  :global(#article th) {
+    color: #00ff41 !important;
+    border-color: #1a1a1a !important;
+  }
+
+  :global(#article td) {
+    border-color: #1a1a1a !important;
+  }
+
+  :global(#article blockquote) {
+    border-left-color: #00ff41 !important;
+    color: #888 !important;
+  }
+
+  :global(#article pre) {
+    background: #111 !important;
+    border: 1px solid #1a1a1a !important;
+  }
+
+  :global(.text-accent) { color: #00ff41 !important; }
+  :global(.border-dashed) { border-color: #1a1a1a !important; }
+</style>
