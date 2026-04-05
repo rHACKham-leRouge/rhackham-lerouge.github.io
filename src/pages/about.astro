@@ -76,7 +76,7 @@ const faq = [
         "At the same time, I am focused on completing the CPTS certification and continuing to strengthen my practical skills through platforms like Hack The Box.",
         "In the mid-term, I aim to obtain the Cyber Defense Engineer diploma while continuing to work on personal projects and certifications such as OSCP or BSCP in my free time.",
         "I also plan to identify a specialization that will be both impactful for my career and engaging in daily work, allowing me to apply my offensive and defensive expertise in real-world environments.",
-        "In the long term, my goal is to become a cybersecurity expert capable of understanding complex systems, identifying vulnerabilities, and delivering tailored security solutions that address each client’s unique challenges.",
+        "In the long term, my goal is to become a cybersecurity expert capable of understanding complex systems, identifying vulnerabilities, and delivering tailored security solutions that address each client's unique challenges.",
         "My journey is guided by a desire to develop practical skills, contribute to meaningful projects, and become a trusted cybersecurity expert for both clients and teams."]
   },
   {
@@ -89,173 +89,155 @@ const faq = [
   },
 ];
 
-const lines: Array<{type: string, text?: string}> = [
-  { type: "prompt" },
-  { type: "command", text: "cat about.txt" },
-  { type: "empty" },
-  { type: "title", text: "[ About Me ]" },
-  { type: "empty" },
-  { type: "output", text: "I didn't get into cybersecurity by following a clear path." },
-  { type: "output", text: "With no academic background or prior skills in this field," },
-  { type: "output", text: "I had to build everything from the ground up, step by step," },
-  { type: "output", text: "through challenges, successes (sometimes failures)," },
-  { type: "output", text: "and most importantly, PERSISTENCE." },
-  { type: "empty" },
-  { type: "output", text: "My goal is to develop strong and well-rounded skills that allow" },
-  { type: "output", text: "me to understand how computer systems are attacked," },
-  { type: "output", text: "and how to protect them effectively." },
-  { type: "empty" },
-  { type: "output", text: "Beyond the technical aspect, I also care about the human side" },
-  { type: "output", text: "of cybersecurity. I want to help people around me feel safer" },
-  { type: "output", text: "when using their devices and browsing the internet." },
-  { type: "output", text: "Many people don't realize how exposed they are." },
-  { type: "output", text: "Some don't know how to protect themselves, while others" },
-  { type: "output", text: "simply believe that \"it only happens to others.\"" },
-  { type: "empty" },
-  { type: "output", text: "Cybersecurity is not just about systems; it's about awareness," },
-  { type: "output", text: "habits, and responsibility. And I feel it is my duty to help" },
-  { type: "output", text: "protect those who can't protect themselves." },
-  { type: "empty" },
-  { type: "prompt" },
-  { type: "command", text: "Q&A --help" },
-  { type: "empty" },
-  { type: "title", text: "[ Questions & Answers ]" },
-  { type: "empty" },
-  { type: "faq" },
-  { type: "empty" },
-  { type: "prompt" },
-  { type: "command", text: "ls /contact" },
-  { type: "empty" },
-  { type: "title", text: "[ Let's Connect ]" },
-  { type: "empty" },
-  { type: "output", text: "If you are on a similar path, working on CTFs," },
-  { type: "output", text: "or building your skills in cybersecurity, feel free to reach out." },
-  { type: "output", text: "Learning is better when it is shared." },
-  { type: "empty" },
-  { type: "contact" },
-  { type: "empty" },
-  { type: "prompt" },
-  { type: "cursor" },
-];
-
-function startTyping() {
-  const consoleEl = document.getElementById("console-about") as HTMLDivElement;
+function renderConsole() {
+  const consoleEl = document.getElementById("console-about");
   if (!consoleEl) return;
-  if ((window as any).__aboutStarted) return;
-  (window as any).__aboutStarted = true;
+  if (consoleEl.dataset.rendered === "true") return;
+  consoleEl.dataset.rendered = "true";
   consoleEl.innerHTML = "";
-  let step = 0;
 
-  function addLine(html: string): HTMLDivElement {
+  function addDiv(html: string, color?: string): HTMLDivElement {
     const div = document.createElement("div");
     div.innerHTML = html;
+    if (color) div.style.color = color;
     consoleEl.appendChild(div);
     return div;
   }
 
-  function runStep(): void {
-    if (step >= lines.length) return;
-    const s = lines[step];
-
-    if (s.type === "empty") {
-      addLine("&nbsp;");
-      step++;
-      setTimeout(runStep, 40);
-
-    } else if (s.type === "prompt") {
-      addLine(`<span class="prompt-text">${PROMPT}</span>`);
-      step++;
-      setTimeout(runStep, 0);
-
-    } else if (s.type === "command") {
-      const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
-      let i = 0;
-      const text = s.text ?? "";
-      const interval = setInterval(() => {
-        i = Math.min(i + 1, text.length);
-        lastDiv.innerHTML = `<span class="prompt-text">${PROMPT}</span>${text.substring(0, i)}`;
-        if (i >= text.length) {
-          clearInterval(interval);
-          step++;
-          setTimeout(runStep, 150);
-        }
-      }, 40);
-
-    } else if (s.type === "title") {
-      addLine(`<div style="font-size:22px; letter-spacing:6px; color:#00ff41; font-weight:bold;">${s.text}</div>`);
-      step++;
-      setTimeout(runStep, 80);
-
-    } else if (s.type === "output") {
-      const div = addLine("");
-      div.style.color = "#e0e0e0";
-      div.textContent = s.text ?? "";
-      step++;
-      setTimeout(runStep, 20);
-
-    } else if (s.type === "faq") {
-      faq.forEach((item) => {
-        const wrapper = document.createElement("div");
-        wrapper.style.marginBottom = "4px";
-
-        const question = document.createElement("div");
-        question.style.color = "#00ff41";
-        question.style.cursor = "pointer";
-        question.style.userSelect = "none";
-        question.innerHTML = `<span style="color:#555;">▶</span> ${item.q}`;
-
-        const answer = document.createElement("div");
-        answer.style.display = "none";
-        answer.style.color = "#e0e0e0";
-        answer.style.paddingLeft = "1.5rem";
-        answer.style.marginTop = "4px";
-        answer.style.marginBottom = "8px";
-        item.a.forEach(line => {
-          const p = document.createElement("div");
-          p.textContent = line;
-          answer.appendChild(p);
-        });
-
-        question.addEventListener("click", () => {
-          const isOpen = answer.style.display !== "none";
-          answer.style.display = isOpen ? "none" : "block";
-          const arrow = question.querySelector("span");
-          if (arrow) arrow.textContent = isOpen ? "▶" : "▼";
-        });
-
-        wrapper.appendChild(question);
-        wrapper.appendChild(answer);
-        consoleEl.appendChild(wrapper);
-      });
-
-      step++;
-      setTimeout(runStep, 80);
-
-    } else if (s.type === "contact") {
-      const div = document.createElement("div");
-      div.style.color = "#e0e0e0";
-      div.innerHTML = `
-        <div>&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a></div>
-        <div>&nbsp;&nbsp;<a href="https://app.hackthebox.com/public/users/2203617" target="_blank">hackthebox.com → rHACKham-leRouge</a></div>
-        <div>&nbsp;&nbsp;<a href="mailto:rh4ck4m_l3_r0uge@proton.me">rh4ck4m_l3_r0uge@proton.me</a></div>
-      `;
-      consoleEl.appendChild(div);
-      step++;
-      setTimeout(runStep, 80);
-
-    } else if (s.type === "cursor") {
-      const lastDiv = consoleEl.lastElementChild as HTMLDivElement;
-      const cursor = document.createElement("span");
-      cursor.className = "cursor";
-      cursor.textContent = "█";
-      lastDiv.appendChild(cursor);
-    }
+  function addText(text: string, color?: string): HTMLDivElement {
+    const div = document.createElement("div");
+    div.textContent = text;
+    if (color) div.style.color = color;
+    consoleEl.appendChild(div);
+    return div;
   }
 
-  runStep();
+  function addEmpty() {
+    const div = document.createElement("div");
+    div.innerHTML = "&nbsp;";
+    consoleEl.appendChild(div);
+  }
+
+  function addPromptCommand(command: string) {
+    addDiv(`<span class="prompt-text">${PROMPT}</span>${command}`);
+  }
+
+  function addTitle(text: string) {
+    addDiv(`<span style="font-size:22px;letter-spacing:6px;color:#00ff41;font-weight:bold;">${text}</span>`);
+  }
+
+  // --- About Me ---
+  addPromptCommand("cat about.txt");
+  addEmpty();
+  addTitle("[ About Me ]");
+  addEmpty();
+
+  const aboutLines = [
+    "I didn't get into cybersecurity by following a clear path.",
+    "With no academic background or prior skills in this field,",
+    "I had to build everything from the ground up, step by step,",
+    "through challenges, successes (sometimes failures),",
+    "and most importantly, PERSISTENCE.",
+    "",
+    "My goal is to develop strong and well-rounded skills that allow",
+    "me to understand how computer systems are attacked,",
+    "and how to protect them effectively.",
+    "",
+    "Beyond the technical aspect, I also care about the human side",
+    "of cybersecurity. I want to help people around me feel safer",
+    "when using their devices and browsing the internet.",
+    "Many people don't realize how exposed they are.",
+    "Some don't know how to protect themselves, while others",
+    "simply believe that \"it only happens to others.\"",
+    "",
+    "Cybersecurity is not just about systems; it's about awareness,",
+    "habits, and responsibility. And I feel it is my duty to help",
+    "protect those who can't protect themselves.",
+  ];
+
+  aboutLines.forEach(line => {
+    if (line === "") addEmpty();
+    else addText(line, "#e0e0e0");
+  });
+
+  // --- Q&A ---
+  addEmpty();
+  addPromptCommand("Q&A --help");
+  addEmpty();
+  addTitle("[ Questions & Answers ]");
+  addEmpty();
+
+  faq.forEach((item) => {
+    const wrapper = document.createElement("div");
+    wrapper.style.marginBottom = "4px";
+
+    const question = document.createElement("div");
+    question.style.color = "#00ff41";
+    question.style.cursor = "pointer";
+    question.style.userSelect = "none";
+    question.innerHTML = `<span style="color:#555;">▶</span> ${item.q}`;
+
+    const answer = document.createElement("div");
+    answer.style.display = "none";
+    answer.style.color = "#e0e0e0";
+    answer.style.paddingLeft = "1.5rem";
+    answer.style.marginTop = "4px";
+    answer.style.marginBottom = "8px";
+
+    item.a.forEach(line => {
+      const p = document.createElement("div");
+      p.textContent = line;
+      answer.appendChild(p);
+    });
+
+    question.addEventListener("click", () => {
+      const isOpen = answer.style.display !== "none";
+      answer.style.display = isOpen ? "none" : "block";
+      const arrow = question.querySelector("span");
+      if (arrow) arrow.textContent = isOpen ? "▶" : "▼";
+    });
+
+    wrapper.appendChild(question);
+    wrapper.appendChild(answer);
+    consoleEl.appendChild(wrapper);
+  });
+
+  // --- Contact ---
+  addEmpty();
+  addPromptCommand("ls /contact");
+  addEmpty();
+  addTitle("[ Let's Connect ]");
+  addEmpty();
+
+  [
+    "If you are on a similar path, working on CTFs,",
+    "or building your skills in cybersecurity, feel free to reach out.",
+    "Learning is better when it is shared.",
+  ].forEach(line => addText(line, "#e0e0e0"));
+
+  addEmpty();
+
+  addDiv(`
+    <div style="color:#e0e0e0;">
+      <div>&nbsp;&nbsp;<a href="https://github.com/rHACKham-leRouge" target="_blank">github.com/rHACKham-leRouge</a></div>
+      <div>&nbsp;&nbsp;<a href="https://app.hackthebox.com/public/users/2203617" target="_blank">hackthebox.com → rHACKham-leRouge</a></div>
+      <div>&nbsp;&nbsp;<a href="mailto:rh4ck4m_l3_r0uge@proton.me">rh4ck4m_l3_r0uge@proton.me</a></div>
+    </div>
+  `);
+
+  addEmpty();
+
+  // Final prompt + blinking cursor only
+  const lastLine = addDiv(`<span class="prompt-text">${PROMPT}</span>`);
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  cursor.textContent = "█";
+  lastLine.appendChild(cursor);
 }
 
-document.addEventListener("astro:page-load", startTyping);
+document.addEventListener("astro:page-load", renderConsole);
+document.addEventListener("DOMContentLoaded", renderConsole);
+if (document.readyState !== "loading") renderConsole();
 </script>
 
 <style>
