@@ -68,3 +68,29 @@ html[data-theme="dark"] {
 :target {
   scroll-margin-block: 1rem;
 }
+body, html {
+  background: #0a0a0a !important;
+}
+
+header {
+  background: #0a0a0a !important;
+  border-bottom: 1px solid #1a1a1a !important;
+}
+
+header * { color: #00ff41 !important; }
+header svg, header svg * {
+  stroke: #00ff41 !important;
+  fill: none !important;
+}
+
+footer {
+  background: #0a0a0a !important;
+  border-top: 1px solid #1a1a1a !important;
+}
+footer * { color: #444 !important; }
+footer a { color: #00c832 !important; }
+
+:root {
+  --background: #0a0a0a !important;
+  --accent: #6699ff !important;
+}
