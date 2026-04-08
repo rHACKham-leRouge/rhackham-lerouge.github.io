@@ -1,6 +1,6 @@
 ---
 title: "Reflected XSS: How It Works, How to Find It, How to Exploit It"
-description: "A deep dive into Reflected XSS. From the basics to real payloads, a commented lab, a real CVE, and how to defend against it. Part 2/4."
+description: "Let's dive into Reflected XSS. From the basics to real payloads, a commented lab, a real-world example, and how to defend against it. Part 2/4."
 pubDatetime: 2026-04-07T00:00:00Z
 tags: ["web", "xss", "series-xss", "beginner"]
 featured: false
