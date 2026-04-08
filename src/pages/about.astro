@@ -90,7 +90,7 @@ const faq = [
 ];
 
 function renderConsole() {
-  const consoleEl = document.getElementById("console-about");
+  const consoleEl = document.getElementById("console-about") as HTMLDivElement;
   if (!consoleEl) return;
   if (consoleEl.dataset.rendered === "true") return;
   consoleEl.dataset.rendered = "true";
