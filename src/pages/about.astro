@@ -90,7 +90,7 @@ const faq = [
 ];
 
 function renderConsole() {
-  const consoleEl = document.getElementById("console-about") as HTMLDivElement;
+  const consoleEl = document.getElementById("console-about");
   if (!consoleEl) return;
   if (consoleEl.dataset.rendered === "true") return;
   consoleEl.dataset.rendered = "true";
@@ -227,7 +227,6 @@ function renderConsole() {
 
   addEmpty();
 
-  // Final prompt + blinking cursor only
   const lastLine = addDiv(`<span class="prompt-text">${PROMPT}</span>`);
   const cursor = document.createElement("span");
   cursor.className = "cursor";
