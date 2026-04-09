@@ -125,7 +125,7 @@ Start with the classic proof of concept:
 
 Submit it. An alert box appears.
 
-![XSS alert popup](/src/assets/images/xss_popup.png)
+![XSS alert popup](/assets/images/xss_popup.png)
 
 **Reflected XSS is confirmed.**
 
@@ -146,7 +146,7 @@ DVWA does not allow us to fully practice cookie stealing in a realistic way, but
 ```html
 <script>alert(document.cookie)</script>
 ```
-![XSS alert popup](/src/assets/images/xss_cookie.png)
+![XSS alert popup](/assets/images/xss_cookie.png)
 
 The popup displays every cookie accessible to JavaScript on the page. In a real attack, an attacker who obtains a victim's cookie can simply open their browser's developer tools, navigate to **Application > Storage > Cookies**, replace their own cookie value with the stolen one, and refresh the page.
 
