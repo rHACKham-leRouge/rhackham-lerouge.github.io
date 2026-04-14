@@ -2,29 +2,32 @@
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import LinkButton from "@/components/LinkButton.astro";
-import { SITE } from "@/config";
+import skullRaw from "@/assets/skull.txt?raw";
 ---
 
-<Layout title={`404 Not Found | ${SITE.title}`}>
+<Layout title="404 — Not Found">
   <Header />
+  <main id="main-content" class="app-layout">
+    <section style="overflow-x: auto; padding: 4rem 1rem; display: flex; flex-direction: column; align-items: center;">
 
-  <main
-    id="main-content"
-    class="app-layout flex flex-1 items-center justify-center"
-  >
-    <div class="mb-14 flex flex-col items-center justify-center">
-      <h1 class="text-9xl font-bold text-accent">404</h1>
-      <span aria-hidden="true">¯\_(ツ)_/¯</span>
-      <p class="mt-4 text-2xl sm:text-3xl">Page Not Found</p>
-      <LinkButton
-        href="/"
-        class="my-6 text-lg underline decoration-dashed underline-offset-8"
-      >
-        Go back home
-      </LinkButton>
-    </div>
+      <pre id="skull" class="font-mono text-xs leading-tight mb-8 select-none"
+        style="white-space: pre; display: inline-block; text-align: left; color: #00ff41;"></pre>
+
+      <h1 class="text-5xl font-bold mb-4" style="color: #00ff41;">404</h1>
+      <p class="font-mono text-lg mb-2" style="color: #00ff41;">Ye be lost, sailor.</p>
+      <p class="font-mono text-sm mb-10" style="color: #00ff41; opacity: 0.6;">This page has sailed off the edge of the map.</p>
+
+      <a href="/" class="font-mono px-6 py-3 transition-colors duration-200"
+        style="color: #00ff41; border: 1px solid #00ff41;">
+        ↩ Back to Port
+      </a>
+
+    </section>
   </main>
-
   <Footer />
 </Layout>
+
+<script define:vars={{ skullRaw }}>
+  const el = document.getElementById("skull");
+  el.textContent = skullRaw;
+</script>
